@@ -69,3 +69,17 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.checkUserExist = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      email: req.body.email,
+      provider: req.body.provider,
+    });
+    res
+      .status(200)
+      .json({ message: "User email not found with given provider", user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
