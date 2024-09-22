@@ -9,7 +9,7 @@ const upload = multer({ storage });
 router.post('/', audioFileController.uploadFile);
 router.post('/uploadfile',  upload.single('file'), audioFileController.uploadAudioFile);
 router.get('/file/:fileId', audioFileController.downloadAudioFile);
-router.get('/user/:userId', audioFileController.getUserFiles);
+router.get('/user/:userId', audioFileController.getUserAudioFiles);
 router.get('/:id', audioFileController.getFileById);
 
 module.exports = router;
