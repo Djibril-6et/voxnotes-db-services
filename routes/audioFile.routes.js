@@ -11,5 +11,6 @@ router.post('/uploadfile',  upload.single('file'), audioFileController.uploadAud
 router.get('/file/:fileId', audioFileController.downloadAudioFile);
 router.get('/user/:userId', audioFileController.getUserAudioFiles);
 router.get('/:id', audioFileController.getFileById);
+router.get('/:id/metadata', audioFileController.getFileMetadataById);
 
 module.exports = router;
