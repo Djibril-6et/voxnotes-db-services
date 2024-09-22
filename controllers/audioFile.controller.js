@@ -45,6 +45,8 @@ exports.getFileById = async (req, res) => {
 };
 
 exports.uploadAudioFile = (req, res) => {
+  const { transcription, userId, title } = req.body; // Récupérer la transcription et l'ID de l'utilisateur envoyés dans le body
+
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
@@ -55,7 +57,12 @@ exports.uploadAudioFile = (req, res) => {
   });
 
   const uploadStream = bucket.openUploadStream(req.file.originalname, {
-    metadata: { mimetype: req.file.mimetype },
+    metadata: { 
+      mimetype: req.file.mimetype,
+      transcription: transcription || "", // Ajouter la transcription
+      userId: userId || "", // Ajouter l'ID de l'utilisateur,
+      title : title || "",
+    },
   });
 
   uploadStream.end(req.file.buffer);
@@ -68,9 +75,10 @@ exports.uploadAudioFile = (req, res) => {
   });
 
   uploadStream.on("error", (err) => {
-    res
-      .status(500)
-      .json({ message: "Error uploading audio file", error: err.message });
+    res.status(500).json({
+      message: "Error uploading audio file",
+      error: err.message,
+    });
   });
 };
 
@@ -96,4 +104,24 @@ exports.downloadAudioFile = (req, res) => {
         .status(404)
         .json({ message: "Audio file not found", error: err.message });
     });
+};
+
+exports.getUserAudioFiles = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const files = await mongoose.connection.db.collection("AudioFiles.files").find({
+      "metadata.userId": userId
+    }).toArray();
+
+    console.log("Files found:", files); // Afficher les fichiers trouvés pour débogage
+
+    if (files.length === 0) {
+      return res.status(404).json({ message: "Aucun fichier audio trouvé pour cet utilisateur" });
+    }
+
+    res.status(200).json(files);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la récupération des fichiers", error: err.message });
+  }
 };
