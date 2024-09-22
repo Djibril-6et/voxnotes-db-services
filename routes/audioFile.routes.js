@@ -12,5 +12,6 @@ router.get('/file/:fileId', audioFileController.downloadAudioFile);
 router.get('/user/:userId', audioFileController.getUserAudioFiles);
 router.get('/:id', audioFileController.getFileById);
 router.get('/:id/metadata', audioFileController.getFileMetadataById);
+router.delete('/file/:fileId', audioFileController.deleteAudioFile);
 
 module.exports = router;

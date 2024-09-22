@@ -44,6 +44,35 @@ exports.getFileById = async (req, res) => {
   }
 };
 
+exports.deleteAudioFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+
+    // Vérification que l'ID est valide et conversion en ObjectId
+    if (!mongoose.Types.ObjectId.isValid(fileId)) {
+      return res.status(400).json({ message: "Invalid file ID format" });
+    }
+
+    const objectId = new mongoose.Types.ObjectId(fileId);
+
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: "AudioFiles",
+    });
+
+    // Supprimer le fichier dans la collection "AudioFiles.files" et "AudioFiles.chunks"
+    bucket.delete(objectId, (err) => {
+      if (err) {
+        return res.status(404).json({ message: "File not found", error: err.message });
+      }
+
+      res.status(200).json({ message: "File and its chunks deleted successfully" });
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting file", error: err.message });
+  }
+};
+
 exports.uploadAudioFile = (req, res) => {
   const { transcription, userId, title } = req.body; // Récupérer la transcription et l'ID de l'utilisateur envoyés dans le body
 
