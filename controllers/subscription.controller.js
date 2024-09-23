@@ -82,3 +82,24 @@ exports.cancelSubscription = async (req, res) => {
     res.status(500).json({ error: 'Failed to cancel subscription', details: error.message });
   }
 };
+
+exports.deleteSubscription = async (req, res) => {
+  const { stripeSessionId } = req.params; // Récupérer stripeSessionId depuis l'URL
+
+  try {
+    // Rechercher et supprimer l'abonnement par l'ID de session Stripe
+    const deletedSubscription = await Subscription.findOneAndDelete({ stripeSessionId });
+
+    if (!deletedSubscription) {
+      return res.status(404).json({ message: 'Subscription not found' });
+    }
+
+    // Répondre avec succès
+    res.status(200).json({
+      message: 'Subscription deleted successfully',
+      deletedSubscription,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete subscription', details: error.message });
+  }
+};

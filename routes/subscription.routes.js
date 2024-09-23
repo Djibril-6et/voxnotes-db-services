@@ -6,5 +6,6 @@ router.post('/', subscriptionController.createSubscription);
 router.get('/user/:userId', subscriptionController.getSubscriptionByUserId);
 router.put('/:id', subscriptionController.updateSubscriptionStatus);
 router.put('/:stripeSessionId/cancel', subscriptionController.cancelSubscription);
+router.delete('/:stripeSessionId', subscriptionController.deleteSubscription);
 
 module.exports = router;
