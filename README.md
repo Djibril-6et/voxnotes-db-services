@@ -56,6 +56,14 @@ npm start
 
 The service will be available at `http://localhost:9090`
 
+## 🤝 Integration with Other Services
+
+This service integrates with:
+- **[Frontend Application](https://github.com/Djibril-6et/voxnotes):** User interface on port 9010
+- **OAuth Service:** Validates JWT tokens
+- **AI Service:** Stores transcription results  
+- **Payment Service:** Updates user subscription status
+
 ## 📡 API Endpoints
 
 ### Users
