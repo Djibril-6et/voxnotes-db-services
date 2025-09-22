@@ -23,8 +23,8 @@ Database microservice for the voice transcription platform. RESTful API handling
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
-cd database-service
+git clone https://github.com/Djibril-6et/voxnotes-db-services.git
+cd voxnotes-db-services
 ```
 
 2. **Install dependencies**
