@@ -19,6 +19,20 @@ app.use(express.urlencoded({ extended: true }));
 // Connect to the database
 connectDB();
 
+const User = require('./models/user.model');
+
+// Créer les index d'unicité
+async function createIndexes() {
+  try {
+    await User.collection.createIndex({ email: 1 }, { unique: true });
+    await User.collection.createIndex({ username: 1 }, { unique: true });
+    console.log("Index d'unicité créés avec succès");
+  } catch (error) {
+    console.log("Index déjà existants ou erreur:", error.message);
+  }
+}
+createIndexes();
+
 // Use routes
 app.use("/api", require("./routes/index.routes"));
 

@@ -7,14 +7,50 @@ const axios = require('axios');
 exports.createUser = async (req, res) => {
   try {
     const { username, email, password, role, provider } = req.body;
+    
+    // Vérifier si l'email existe déjà
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ 
+        message: "Un compte existe déjà avec cet email."
+      });
+    }
+    
+    // Vérifier si le username existe déjà
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({ 
+        message: "Ce nom d'utilisateur est déjà pris."
+      });
+    }
+    
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ username, email, passwordHash, provider, role });
+    const newUser = new User({ 
+      username, 
+      email, 
+      passwordHash, 
+      provider: provider || 'email', 
+      role 
+    });
+    
     await newUser.save();
 
     res.status(201).json({ message: 'User created successfully', user: newUser });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Erreur création utilisateur:", err);
+    
+    // Gestion spécifique des erreurs MongoDB
+    if (err.code === 11000) {
+      if (err.keyPattern?.email) {
+        return res.status(400).json({ message: "Un compte existe déjà avec cet email." });
+      }
+      if (err.keyPattern?.username) {
+        return res.status(400).json({ message: "Ce nom d'utilisateur est déjà pris." });
+      }
+    }
+    
+    res.status(500).json({ message: "Erreur lors de la création du compte." });
   }
 };
 
@@ -73,13 +109,28 @@ exports.loginUser = async (req, res) => {
 
 exports.checkUserExist = async (req, res) => {
   try {
-    const user = await User.findOne({
-      email: req.body.email,
-      provider: req.body.provider,
-    });
-    res
-      .status(200)
-      .json({ message: "User email not found with given provider", user });
+    let query = { email: req.body.email };
+    
+    // Si un provider est spécifié, l'ajouter à la recherche
+    if (req.body.provider) {
+      query.provider = req.body.provider;
+    }
+    
+    const user = await User.findOne(query);
+    
+    if (user) {
+      res.status(200).json({ 
+        message: "User found", 
+        user,
+        exists: true 
+      });
+    } else {
+      res.status(200).json({ 
+        message: "User not found", 
+        user: null,
+        exists: false 
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
